@@ -1,10 +1,11 @@
 #!/bin/bash
-#----------------------------
+#---------------------------- Phonebook, version 2.5 ----------------------------------------
 # ADDED FEATURES IN THIS CODE
 #checking on the file that contain the data base if it does exist
 #organizing the code into functions
 #if the calling of this bash has no fed arguments, return options
 #adding the option to create new database file in case file does not exist. 
+#delete user is now possible 
 #----------------------------
 # old features
 # searching by name is possible even if we search on 'Ahmed' while name is stored 'ahmed'
@@ -17,6 +18,10 @@
 # being more powerful in showing the name and phone in more professional way in the search method.
 # Adding the phonebook database inside the bash script (problem only with view & delete database features)
 # what else after creating new file if not exist? I need to make the file name does not exist
+
+
+# delete bug #1 (case sensitive && matches word, not while name) 
+# delete bug #2 if two users have same title in their name, it will delete both
 ##############################################################
 export FILE=phonebookDB.txt
 clear
@@ -85,7 +90,7 @@ function fun2 {
 			#check on name if exist before?
 			#put limitation on name '50' char, put limitation on each name '10' chars.
 		#if [ ${#phone_entry} != 11 ]; then echo ""; exit 1; fi		
-		echo "correct"
+			echo ""
 		else echo "Error, invalid phone number. phone number must consist of 11 digits start with '01'"; exit 1; fi
 		#
 		#
@@ -95,7 +100,7 @@ function fun2 {
  	if grep -Eix "$PHONE_ENTRY" "$FILE"  > /dev/null ; then #search on the phone number inside the phoneDB	
 	echo "Error, this phonenumber already exists with another name.";	exit 1;	fi
 				
-	echo "end of function2"
+	#echo "end of function2"
 }
 ###################################################################################
 localswitch=$1 # this will switch on value of first parameter given to the bash and ignore rest of parameters if exists.
@@ -106,16 +111,15 @@ case $localswitch in
 	read -p " enter phone: " PHONE_ENTRY
 	fun1
 	fun2
-	echo $NAME_ENTRY >> "$FILE"
-	echo $PHONE_ENTRY >> "$FILE"
+	echo "$NAME_ENTRY;$PHONE_ENTRY" >> "$FILE"
 	echo "Data was inserted sucessfully, thank you"
 	;;
 	
 "-v")
-	echo "viewing phonebook data: "
-	echo "------------------------"
-	fun3
-	cat "$FILE"
+		echo "viewing phonebook data: "
+		echo "------------------------"
+		fun3
+		cat "$FILE"
 	;;
 
 "-s")
@@ -125,7 +129,8 @@ case $localswitch in
 	echo " ---- name & phone number ---- "
 	printf "     "
 	grep -i "$NAME_ENTRY" "$FILE" | tr ";" ">"
-	else echo "name was not found" ; fi
+	else echo "name was not found0"
+	     echo "exiting the phonebook bash" ; fi
 	
 	;;
 
@@ -138,7 +143,16 @@ case $localswitch in
 	#check on name exists ? ---> delete the contact and prompt if user want to view after deleting
 	echo "enter name to delete it"
 	read -p " enter name: " NAME_ENTRY
-
+	if grep -i "$NAME_ENTRY" "$FILE"  > /dev/null ; then  # if the file do exist in the phonebook
+	#a regex '$' and '^' is added beside the variable name to prevent deleting any user but only one specific user.
+		sed "/^$NAME_ENTRY;/d" phonebookDB.txt > phonebookDB.txt # print the result of 'sed' to the same file to apply changes made by 'sed' to the file
+		#sed -n'/^$/d' "$FILE"     #to delete empty lines in a file
+		echo "name was deleted successfully"
+	else
+		echo "name was not found"
+	fi
+	# sed command is case sensitive and I dont know how not to make it like that
+	# also how to check if sed found the line?
 	;;
 *)
 	echo "unkown choice, please try again";;
