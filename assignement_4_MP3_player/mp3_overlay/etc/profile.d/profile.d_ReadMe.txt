@@ -1,0 +1,18 @@
+The /etc/profile. d directory contains other scripts that contain 
+application-specific startup files, which are also executed at startup time by the shell.
+
+
+
+Files in /etc/profile.d/ are run when a user logs in (unless you've modified /etc/profile to not do this)
+and are generally used to set environment variables.
+
+
+
+/etc/profile.d is a vendor-specific means of customizing the environment of a shell session (setting PATH and so forth), 
+and would not typically be related to the startup of a daemon; some would even argue that daemon startup should in no 
+way involve /etc/profile.d, so that user shell customizations cannot cause a daemon to fail to load, or to load with 
+incorrect environment settings (timezone, locale, or so forth).
+
+/etc/init.d is part of the SystemV init system as implemented on Linux (Digital UNIX by contrast placed it under 
+/sbin/init.d); one could write a proper init script (study the existing scripts to see how to do this properly) 
+that would launch your daemon. This would give you compatibility with both RHEL6 and RHEL7.
